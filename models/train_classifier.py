@@ -2,6 +2,7 @@ import sys
 import numpy as np
 import pandas as pd
 from sqlalchemy import create_engine
+import sqlite3
 import nltk
 import re
 from sklearn.metrics import confusion_matrix
@@ -18,6 +19,7 @@ from sklearn.metrics import classification_report,accuracy_score,homogeneity_sco
 from sklearn.model_selection import GridSearchCV
 from sklearn.base import TransformerMixin, BaseEstimator
 from sklearn.decomposition import LatentDirichletAllocation, NMF
+from sklearn.externals import joblib
 
 nltk.download('punkt')
 nltk.download('wordnet')
@@ -25,12 +27,12 @@ nltk.download('stopwords')
 
 
 def load_data(database_filepath):
-    engine = create_engine(database_filepath)
-    df = pd.read_sql("SELECT * FROM DisasterResponse", engine)
+    con = sqlite3.connect(database_filepath)
+    df = pd.read_sql("SELECT * FROM DisasterResponse", con)
     X = df[['message','genre']].values # ,'genre'
     y = df.iloc[:,4:].values
     category_names = df.columns[4:]
-    return X, Y, category_names
+    return X, y, category_names
 
 def tokenize(text):
     text = re.sub(r"[^a-zA-Z0-9]", " ", text.lower())
@@ -92,7 +94,7 @@ def build_model(search=False, model_func=None):
         return model
 
 
-def evaluate_model(pipeline, model, X_test, Y_test, category_names, search=None):
+def evaluate_model(pipeline, model, X_test, y_test, category_names, search=None):
     assert y_test.shape[0] == X_test.shape[0]
     X_test_tfd = pipeline.transform(X_test)
     y_pred = model.predict(X_test_tfd)
@@ -111,7 +113,8 @@ def evaluate_model(pipeline, model, X_test, Y_test, category_names, search=None)
 
 
 def save_model(model, model_filepath):
-    pass
+    joblib.dump(model, model_filepath)
+    return
 
 
 def main():
