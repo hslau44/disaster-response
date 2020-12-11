@@ -26,11 +26,12 @@ def tokenize(text):
     return clean_tokens
 
 # load data
-# engine = create_engine('sqlite:///../data/DisasterResponse.db')
-# df = pd.read_sql_table('DisasterResponse', engine)
+engine = create_engine('sqlite:///./data/DisasterResponse.db')
+df = pd.read_sql_table('DisasterResponse', engine)
 
-con = sqlite3.connect('sqlite:///../data/DisasterResponse.db')
-df = pd.read_sql("SELECT * FROM DisasterResponse", con)
+# con = sqlite3.connect('./data/DisasterResponse.db')
+# df = pd.read_sql("SELECT * FROM DisasterResponse", con)
+print(df.shape)
 
 # load model
 model = joblib.load("./models/classifier.pkl")
@@ -96,7 +97,7 @@ def go():
 
 
 def main():
-    app.run(host='0.0.0.0', port=3001, debug=True)
+    app.run(host='localhost', port=8899, debug=True)
 
 
 if __name__ == '__main__':
