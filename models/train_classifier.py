@@ -56,6 +56,15 @@ class Column_extractor(TransformerMixin, BaseEstimator):
         else:
             return X[:,self.col_nums]
 
+
+def transfrom_text_query(query):
+    items = query.split('|')
+    if len(items) == 1:
+        arr = np.array([items[0],'direct']).reshape(1,2)
+    else:
+        arr =  np.array(items).reshape(1,len(items))
+    return arr
+
 def build_pipeline():
     nlp_pipeline = Pipeline([
         ('text_extract',Column_extractor(0,vectorise=False)),
@@ -140,7 +149,8 @@ def main():
         evaluate_model(pipeline, model, X_test, Y_test, category_names)
 
         print('Saving model...\n    MODEL: {}'.format(model_filepath))
-        save_model(model, model_filepath)
+        save_model(pipeline, model_filepath +'/pipeline.pkl')
+        save_model(model, model_filepath +'/classifier.pkl')
 
         print('Trained model saved!')
 

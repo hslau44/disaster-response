@@ -11,5 +11,5 @@
 2. Run the following command in the app's directory to run your web app.
     `python app/run.py {host}{port}`
 
-    - If `host` or `port` is not defined, the apps will direct you to `localhost` and `8899` respectively.
+    - If `host` or `port` are not defined, the apps will direct to `localhost` and `8899` respectively.
     - For default setting, as the app finish setting up, go to http://localhost:8899/
