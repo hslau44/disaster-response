@@ -10,7 +10,14 @@ from flask import render_template, request, jsonify
 from plotly.graph_objs import Bar
 from sklearn.externals import joblib
 from sqlalchemy import create_engine
-import sqlite3
+import os
+import sys
+
+root_folder = os.path.abspath(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+sys.path.append(root_folder)
+from models.train_classifier import Column_extractor,transfrom_text_query
+
+
 
 app = Flask(__name__)
 
@@ -31,9 +38,9 @@ df = pd.read_sql_table('DisasterResponse', engine)
 
 # con = sqlite3.connect('./data/DisasterResponse.db')
 # df = pd.read_sql("SELECT * FROM DisasterResponse", con)
-print(df.shape)
 
 # load model
+pipeline = joblib.load("./models/pipeline.pkl")
 model = joblib.load("./models/classifier.pkl")
 
 
@@ -85,7 +92,8 @@ def go():
     query = request.args.get('query', '')
 
     # use model to predict classification for query
-    classification_labels = model.predict([query])[0]
+    inputs = transfrom_text_query(query)
+    classification_labels = model.predict(pipeline.transform(inputs))[0]
     classification_results = dict(zip(df.columns[4:], classification_labels))
 
     # This will render the go.html Please see that file.
@@ -97,7 +105,12 @@ def go():
 
 
 def main():
-    app.run(host='localhost', port=8899, debug=True)
+    if len(sys.argv) == 3:
+        host,port = sys.argv[1:]
+    else:
+        host,port = 'localhost',8899
+
+    app.run(host=host, port=port, debug=True)
 
 
 if __name__ == '__main__':
