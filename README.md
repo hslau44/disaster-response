@@ -1,5 +1,8 @@
 # Disaster Response Pipeline Project
 
+This repository is Udacity Data engineering project. To help responding the messages received during the disaster, this web app is built to help the user(Analyst) to classify a piece message into specific category(ies), so that the user can forward the message to the corresponding disaster relief agencies.   
+
+
 ### Instructions:
 1. Run the following commands in the project's root directory to set up your database and model.
 
@@ -13,3 +16,5 @@
 
     - If `host` or `port` are not defined, the apps will direct to `localhost` and `8899` respectively.
     - For default setting, as the app finish setting up, go to http://localhost:8899/
+
+3. Type the message in the search engine
