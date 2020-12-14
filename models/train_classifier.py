@@ -29,7 +29,7 @@ nltk.download('stopwords')
 def load_data(database_filepath):
     con = sqlite3.connect(database_filepath)
     df = pd.read_sql("SELECT * FROM DisasterResponse", con)
-    X = df[['message','genre']].values # ,'genre'
+    X = df[['message','genre']].values
     y = df.iloc[:,4:].values
     category_names = df.columns[4:]
     return X, y, category_names
@@ -42,7 +42,9 @@ def tokenize(text):
     return tokens
 
 class Column_extractor(TransformerMixin, BaseEstimator):
-
+    """
+    A transformer that returns array of the predefined column(s) from the input array
+    """
     def __init__(self,col_nums,vectorise=True):
         self.col_nums = col_nums
         self.vectorise = vectorise
@@ -58,6 +60,16 @@ class Column_extractor(TransformerMixin, BaseEstimator):
 
 
 def transfrom_text_query(query):
+    """
+    transform text into the input format for the model
+
+    Input:
+    query: str; the text that is passing to the web apps
+
+    Output:
+    arr: Numpy.ndarry; correct format for inputing into the model
+
+    """
     items = query.split('|')
     if len(items) == 1:
         arr = np.array([items[0],'direct']).reshape(1,2)
@@ -66,6 +78,10 @@ def transfrom_text_query(query):
     return arr
 
 def build_pipeline():
+    """
+    Return data preprocessing Pipeline
+    """
+
     nlp_pipeline = Pipeline([
         ('text_extract',Column_extractor(0,vectorise=False)),
         ('vect', CountVectorizer(tokenizer=tokenize)),
@@ -86,7 +102,18 @@ def build_pipeline():
         ])
     return pipeline
 
-def build_model(search=False, model_func=None):
+def build_model(model_func=None,search=False):
+    """
+    Build model (default:RandomForestClassifier)
+
+    Input:
+    model_func: sklearn.base; a sklearn model
+    search: bool; applying GridSearchCV
+
+    Output:
+    model: sklearn.base; model
+    """
+
     if model_func == True:
         model = model_func()
     else:
@@ -94,19 +121,35 @@ def build_model(search=False, model_func=None):
 
     if search == True:
         parameters = {
-            'estimator__n_estimators': [50],
-            'estimator__min_samples_split': [2],
+            'estimator__n_estimators': [50,100,200],
+            'estimator__min_samples_split': [2,3,4]
         }
         cv = GridSearchCV(model, param_grid=parameters)
+        print("GridSearchCV model built")
         return cv
     else:
+        print("Normal model built")
         return model
 
 
 def evaluate_model(pipeline, model, X_test, y_test, category_names, search=None):
+    """
+    Validate model (and pipeline) using test setting
+
+    Input:
+    pipeline: sklearn.pipeline; pipeline for preprocessing the data, data
+    will not be transformed if it is not equal to True
+    model: sklearn.base; trained model for perdiction
+    X_test:
+    y_test:
+    category_names:
+    search: bool: if True, it prints the best parameter of the model
+
+    """
     assert y_test.shape[0] == X_test.shape[0]
-    X_test_tfd = pipeline.transform(X_test)
-    y_pred = model.predict(X_test_tfd)
+    if pipeline == True:
+        X_test = pipeline.transform(X_test )
+    y_pred = model.predict(X_test)
     assert y_test.shape == y_pred.shape
     scores = []
     for i in range(y_pred.shape[-1]):
@@ -127,8 +170,14 @@ def save_model(model, model_filepath):
 
 
 def main():
-    if len(sys.argv) == 3:
-        database_filepath, model_filepath = sys.argv[1:]
+    if 3 <= len(sys.argv) <= 4:
+        if len(sys.argv) == 3:
+            database_filepath, model_filepath = sys.argv[1:]
+            search = False
+        else:
+            database_filepath, model_filepath, search = sys.argv[1:]
+            tranlator = lambda x: True if x == "True" else False
+            search = tranlator(search)
         print('Loading data...\n    DATABASE: {}'.format(database_filepath))
         X, Y, category_names = load_data(database_filepath)
         X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.2)
@@ -137,7 +186,7 @@ def main():
         pipeline = build_pipeline()
 
         print('Building model...')
-        model = build_model()
+        model = build_model(model_func=None, search=search)
 
         print('Transform data...')
         X_train = pipeline.fit_transform(X_train)
@@ -146,9 +195,9 @@ def main():
         model.fit(X_train, Y_train)
 
         print('Evaluating model...')
-        evaluate_model(pipeline, model, X_test, Y_test, category_names)
+        evaluate_model(pipeline, model, X_test, Y_test, category_names,search)
 
-        print('Saving model...\n    MODEL: {}'.format(model_filepath))
+        print('Saving models...')
         save_model(pipeline, model_filepath +'/pipeline.pkl')
         save_model(model, model_filepath +'/classifier.pkl')
 
