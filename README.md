@@ -10,7 +10,7 @@ This repository is Udacity Data engineering project. To help responding the mess
 
 2. data
     - disaster_messages.csv : corresponding categories of the message
-    - disaster_categories.csv : original from of the message
+    - disaster_categories.csv : original form of the message
     - (optional) DisasterResponse.db : SQLite database storing ETL data, create if not exist.
     - process_data.py : python script of the ETL pipeline; ETL loads the original data, merge and clean the data and save the data into SQLite database
 
@@ -38,4 +38,4 @@ This repository is Udacity Data engineering project. To help responding the mess
 
     - User can defined the genre of the message by adding `|` between the message and genre:
       `{message}|{genre}`
-    - the available genre are `direct` (default), `social`, and `news`. 
+    - the available genre are `direct` (default), `social`, and `news`.
