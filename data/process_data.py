@@ -28,6 +28,7 @@ def clean_data(messages,categories):
     for col in category_colnames:
         categories[col] = categories['categories'].apply(lambda x: x[col])
 
+    categories = categories[(categories[category_colnames].isin([0,1])).all(axis=1)]
     categories = categories.drop(['categories'],axis=1)
     df = pd.merge(messages,categories,on='id',how='inner')
     df = df.drop_duplicates()
@@ -35,7 +36,7 @@ def clean_data(messages,categories):
 
 
 def save_data(df, database_filename):
-    engine = create_engine(database_filename) # 'sqlite:///' + 
+    engine = create_engine(database_filename) # 'sqlite:///' +
     df.to_sql('DisasterResponse', engine, index=False)
     return
 
