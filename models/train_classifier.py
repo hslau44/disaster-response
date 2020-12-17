@@ -15,7 +15,7 @@ from sklearn.feature_extraction.text import CountVectorizer, TfidfTransformer,Fe
 from sklearn.preprocessing import OneHotEncoder,LabelEncoder
 from sklearn.datasets import make_multilabel_classification
 from sklearn.multioutput import MultiOutputClassifier
-from sklearn.metrics import classification_report,accuracy_score,homogeneity_score,completeness_score,f1_score
+from sklearn.metrics import classification_report,accuracy_score,homogeneity_score,completeness_score,f1_score,precision_score,recall_score
 from sklearn.model_selection import GridSearchCV
 from sklearn.base import TransformerMixin, BaseEstimator
 from sklearn.decomposition import LatentDirichletAllocation, NMF
@@ -166,12 +166,10 @@ def evaluate_model(pipeline, model, X_test, y_test, category_names, search=None)
     assert y_test.shape == y_pred.shape
     scores = []
     for i in range(y_pred.shape[-1]):
-        score =  f1_score(y_test[:,i],y_pred[:,i],average='macro')
-        scores.append(score)
-    print('F1-score')
-    print("Mean: ", np.mean(scores))
-    print("Maximum: ", np.round(np.max(scores),3)," column: ", category_names[np.argmax(scores)])
-    print("Maximum: ", np.round(np.min(scores),3)," column: ", category_names[np.argmin(scores)])
+        precision = precision_score(y_test[:,i],y_pred[:,i],average='macro')
+        recall = recall_score(y_test[:,i],y_pred[:,i],average='macro')
+        f1 =  f1_score(y_test[:,i],y_pred[:,i],average='macro')
+        print('category: ',category_names[i],'\tprecision: ',round(precision),'\trecall: ',round(recall),'\tf1: ',round(f1))
     if search == True:
         print("Best Parameters:", model.best_params_)
     return
