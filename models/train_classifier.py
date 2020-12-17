@@ -39,7 +39,7 @@ def load_data(database_filepath):
 
 def tokenize(text):
     """
-    Tokenize a text message into a list of processed word  
+    Tokenize a text message into a list of processed word
 
     Input:
     text: str; original text message
@@ -161,8 +161,7 @@ def evaluate_model(pipeline, model, X_test, y_test, category_names, search=None)
 
     """
     assert y_test.shape[0] == X_test.shape[0]
-    if pipeline == True:
-        X_test = pipeline.transform(X_test )
+    X_test = pipeline.transform(X_test )
     y_pred = model.predict(X_test)
     assert y_test.shape == y_pred.shape
     scores = []
