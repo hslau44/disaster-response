@@ -15,25 +15,25 @@ import sys
 
 root_folder = os.path.abspath(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 sys.path.append(root_folder)
-from models.train_classifier import Column_extractor,transfrom_text_query
+from models.train_classifier import Column_extractor,transfrom_text_query,tokenize
 
 
 
 app = Flask(__name__)
 
-def tokenize(text):
-    tokens = word_tokenize(text)
-    lemmatizer = WordNetLemmatizer()
-
-    clean_tokens = []
-    for tok in tokens:
-        clean_tok = lemmatizer.lemmatize(tok).lower().strip()
-        clean_tokens.append(clean_tok)
-
-    return clean_tokens
+# def tokenize(text):
+#     tokens = word_tokenize(text)
+#     lemmatizer = WordNetLemmatizer()
+#
+#     clean_tokens = []
+#     for tok in tokens:
+#         clean_tok = lemmatizer.lemmatize(tok).lower().strip()
+#         clean_tokens.append(clean_tok)
+#
+#     return clean_tokens
 
 # load data
-engine = create_engine('sqlite:///./data/DisasterResponse.db')
+engine = create_engine('sqlite:///../data/DisasterResponse.db')
 df = pd.read_sql_table('DisasterResponse', engine)
 
 # con = sqlite3.connect('./data/DisasterResponse.db')
