@@ -27,6 +27,9 @@ nltk.download('stopwords')
 
 
 def load_data(database_filepath):
+    """
+    Load the databaase and return the features, label and the category names
+    """
     con = sqlite3.connect(database_filepath)
     df = pd.read_sql("SELECT * FROM DisasterResponse", con)
     X = df[['message','genre']].values
@@ -35,6 +38,15 @@ def load_data(database_filepath):
     return X, y, category_names
 
 def tokenize(text):
+    """
+    Tokenize a text message into a list of processed word  
+
+    Input:
+    text: str; original text message
+
+    Return:
+    tokens: list; list of processed word
+    """
     text = re.sub(r"[^a-zA-Z0-9]", " ", text.lower())
     tokens = nltk.word_tokenize(text)
     # tokens = [tok for tok in tokens if tok not in nltk.corpus.stopwords.words("english")]
@@ -64,7 +76,9 @@ def transfrom_text_query(query):
     transform text into the input format for the model
 
     Input:
-    query: str; the text that is passing to the web apps
+    query: str; the text that is passing to the web apps, user can defined the
+    genre of the message by adding "|", the avalable genre are 'direct',
+    'social', 'news'
 
     Output:
     arr: Numpy.ndarry; correct format for inputing into the model
@@ -171,13 +185,17 @@ def save_model(model, model_filepath):
 
 def main():
     if 3 <= len(sys.argv) <= 4:
+
+        # input
+        tranlator = lambda x: True if x == "True" else False
         if len(sys.argv) == 3:
             database_filepath, model_filepath = sys.argv[1:]
             search = False
         else:
             database_filepath, model_filepath, search = sys.argv[1:]
-            tranlator = lambda x: True if x == "True" else False
-            search = tranlator(search)
+        search = tranlator(search)
+
+        # load data
         print('Loading data...\n    DATABASE: {}'.format(database_filepath))
         X, Y, category_names = load_data(database_filepath)
         X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.2)
