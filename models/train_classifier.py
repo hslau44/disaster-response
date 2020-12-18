@@ -37,6 +37,14 @@ def load_data(database_filepath):
     category_names = df.columns[4:]
     return X, y, category_names
 
+def load_dataframe(database_filepath):
+    """
+    Load the databaase and return pandas.dataframe
+    """
+    con = sqlite3.connect(database_filepath)
+    df = pd.read_sql("SELECT * FROM DisasterResponse", con)
+    return df
+
 def tokenize(text):
     """
     Tokenize a text message into a list of processed word
