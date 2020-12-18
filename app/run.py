@@ -1,6 +1,7 @@
 import json
 import plotly
 import pandas as pd
+import numpy as np
 
 from nltk.stem import WordNetLemmatizer
 from nltk.tokenize import word_tokenize
@@ -17,6 +18,23 @@ root_folder = os.path.abspath(os.path.dirname(os.path.dirname(os.path.abspath(__
 sys.path.append(root_folder)
 from models.train_classifier import Column_extractor,transfrom_text_query,tokenize
 
+
+def category_info(df):
+    """
+    Return the amount of data in each category(normalized), and the category names.
+
+    Return:
+    category_counts: pandas.core.series.Series; amount of data in each category(normalized)
+    category_names: list; the category names
+    """
+    y = df.iloc[:,4:].values
+    category_names = df.columns[4:].tolist()
+    dic = {}
+    total = y.shape[0]
+    for i in range(y.shape[1]):
+        dic[category_names[i]] = y[y[:,i] == 1].shape[0]/total
+    category_counts = pd.Series(dic)
+    return category_counts,category_names
 
 
 app = Flask(__name__)
@@ -54,6 +72,8 @@ def index():
     genre_counts = df.groupby('genre').count()['message']
     genre_names = list(genre_counts.index)
 
+    category_counts,category_names = category_info(df)
+
     # create visuals
     # TODO: Below is an example - modify to create your own visuals
     graphs = [
@@ -72,6 +92,24 @@ def index():
                 },
                 'xaxis': {
                     'title': "Genre"
+                }
+            }
+        },
+        {
+            'data': [
+                Bar(
+                    x=category_names,
+                    y=category_counts
+                )
+            ],
+
+            'layout': {
+                'title': 'Distribution of Category',
+                'yaxis': {
+                    'title': "Percentage"
+                },
+                'xaxis': {
+                    'title': "Category"
                 }
             }
         }
