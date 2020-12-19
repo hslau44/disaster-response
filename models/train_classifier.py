@@ -177,13 +177,16 @@ def evaluate_model(pipeline, model, X_test, y_test, category_names, search=None)
         precision = precision_score(y_test[:,i],y_pred[:,i],average='macro')
         recall = recall_score(y_test[:,i],y_pred[:,i],average='macro')
         f1 =  f1_score(y_test[:,i],y_pred[:,i],average='macro')
-        print('category: ',category_names[i],'\tprecision: ',round(precision),'\trecall: ',round(recall),'\tf1: ',round(f1))
+        print('category: ',category_names[i],'\tprecision: ',round(precision,2),'\trecall: ',round(recall,2),'\tf1: ',round(f1,2))
     if search == True:
         print("Best Parameters:", model.best_params_)
     return
 
 
 def save_model(model, model_filepath):
+    """
+    Save model to model_filepath with joblib
+    """
     joblib.dump(model, model_filepath)
     return
 
