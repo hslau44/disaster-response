@@ -23,6 +23,9 @@ def category_info(df):
     """
     Return the amount of data in each category(normalized), and the category names.
 
+    Input:
+    df: pandas.DataFrame
+
     Return:
     category_counts: pandas.core.series.Series; amount of data in each category(normalized)
     category_names: list; the category names
