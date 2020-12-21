@@ -61,8 +61,8 @@ df = pd.read_sql_table('DisasterResponse', engine)
 # df = pd.read_sql("SELECT * FROM DisasterResponse", con)
 
 # load model
-pipeline = joblib.load("./models/pipeline.pkl")
-model = joblib.load("./models/classifier.pkl")
+pipeline = joblib.load("../models/pipeline.pkl")
+model = joblib.load("../models/classifier.pkl")
 
 
 # index webpage displays cool visuals and receives user input text for model
@@ -109,7 +109,7 @@ def index():
             'layout': {
                 'title': 'Distribution of Category',
                 'yaxis': {
-                    'title': "Percentage"
+                    'title': "Proportion"
                 },
                 'xaxis': {
                     'title': "Category"
